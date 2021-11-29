@@ -349,8 +349,10 @@ class CNMF(object):
             path = self.get('data', 'fnames')[0]
             subfolder = self.get('data', 'var_name_hdf5')
             f = h5py.File(self.get(path, 'r+')
+                          
+            subfolders = [x for x in f]
 
-            if subfolder+'_transformed' not in [x for x in f]:
+            if subfolder+'_transformed' not in subfolders:
                 
                 #save the stack as an array in memory
                 stack = np.array(f[subfolder])
@@ -360,7 +362,7 @@ class CNMF(object):
                 matlab_file = self.params.get('data', 'source_is_mat')
                 if matlab_file == True:
                     stack = np.transpose(stack, axes = (0,2,1))
-
+                
                 #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
                 motion_corrected_source = self.params.get('data', 'source_is_mc')
                 if motion_corrected_source == True:
@@ -377,7 +379,9 @@ class CNMF(object):
                           
             else:
                 self.params.data.var_name_hdf5 = subfolder+'_transformed'
-                self.params.motion.var_name_hdf5 = subfolder+'_transformed'            
+                self.params.motion.var_name_hdf5 = subfolder+'_transformed' 
+                          
+        #End additional code
                           
         if indices is None:
             indices = (slice(None), slice(None))
