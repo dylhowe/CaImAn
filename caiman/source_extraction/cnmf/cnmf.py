@@ -346,8 +346,8 @@ class CNMF(object):
         if self.params.get('data', 'source_is_mat') == True or self.params.get('data', 'source_is_mc') == True:
 
             #open the mat file 
-            path = self.get('data', 'fnames')[0]
-            subfolder = self.get('data', 'var_name_hdf5')
+            path = self.params.get('data', 'fnames')[0]
+            subfolder = self.params.get('data', 'var_name_hdf5')
             f = h5py.File(path, 'r+')
 
             if subfolder+'_transformed' not in [x for x in f]:
