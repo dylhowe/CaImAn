@@ -99,7 +99,7 @@ class CNMF(object):
                  max_num_added=3, min_num_trial=2, thresh_CNN_noisy=0.5,
                  fr=30, decay_time=0.4, min_SNR=2.5, ssub_B=2, init_iter=2,
                  sniper_mode=False, use_peak_max=False, test_both=False,
-                 expected_comps=500, max_merge_area=None, params=None):
+                 expected_comps=500, max_merge_area=None, params=None, source_is_mat = False, source_is_mc = False):
         """
         Constructor of the CNMF method
 
@@ -262,6 +262,15 @@ class CNMF(object):
 
             max_merge_area: int, optional
                 maximum area (in pixels) of merged components, used to determine whether to merge components during fitting process
+                
+            mat_file: bool, optional
+                Custom added for UVA Visual Neuroscience Capstone project - flags whether the source movie is saved in .mat format (t, y, x)
+                Triggers transformation that will rearrange axes
+                
+            motion_corrected: bool, optional
+                Custom added for UVA Visual Neuroscience Capstone project - flags whether the source movie has already been motion corrected (will contain nan's)
+                Triggers transformation that will fill nan's with zero
+            
         """
 
         self.dview = dview
@@ -273,6 +282,10 @@ class CNMF(object):
         # these are member variables related to the CNMF workflow
         self.skip_refinement = skip_refinement
         self.remove_very_bad_comps = remove_very_bad_comps
+        
+        # these are added params related to transforming .mat formatted files and motion corrected files to be digested by caiman
+        self.source_is_mat = source_is_mat
+        self.source_is_mc = source_is_mc
 
         if params is None:
             self.params = CNMFParams(
@@ -298,7 +311,7 @@ class CNMF(object):
                 sniper_mode=sniper_mode, test_both=test_both, thresh_CNN_noisy=thresh_CNN_noisy,
                 thresh_fitness_delta=thresh_fitness_delta, thresh_fitness_raw=thresh_fitness_raw, thresh_overlap=thresh_overlap,
                 update_num_comps=update_num_comps, use_dense=use_dense, use_peak_max=use_peak_max, alpha_snmf=alpha_snmf,
-                max_merge_area=max_merge_area
+                max_merge_area=max_merge_area, source_is_mat=source_is_mat, source_is_mc=source_is_mc
             )
         else:
             self.params = params
