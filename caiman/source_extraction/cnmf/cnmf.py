@@ -373,12 +373,12 @@ class CNMF(object):
                 f.create_dataset(new_subfolder, data=stack)
                 f.close()
 
-                self.params.data.var_name_hdf5 = new_subfolder
-                self.params.motion.var_name_hdf5 = new_subfolder
+                self.params.data['var_name_hdf5'] = new_subfolder
+                self.params.motion['var_name_hdf5'] = new_subfolder
                           
             else:
-                self.params.data.var_name_hdf5 = subfolder+'_transformed'
-                self.params.motion.var_name_hdf5 = subfolder+'_transformed' 
+                self.params.data['var_name_hdf5'] = subfolder+'_transformed'
+                self.params.motion['var_name_hdf5'] = subfolder+'_transformed' 
                           
         #End additional code
                           
