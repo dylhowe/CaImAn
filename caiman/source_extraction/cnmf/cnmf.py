@@ -330,7 +330,7 @@ class CNMF(object):
           f = h5py.File(self.get(fnames, 'r+')
 
           #save the stack as an array in memory
-          stack = f[subfolder][:]
+          stack = np.array(f[subfolder])
 
           #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
 
