@@ -34,6 +34,7 @@ import scipy
 import sys
 import glob
 import pathlib
+import h5py
 
 from .estimates import Estimates
 from .initialization import initialize_components, compute_W
