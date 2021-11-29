@@ -319,6 +319,38 @@ class CNMF(object):
 
         self.estimates = Estimates(A=Ain, C=Cin, b=b_in, f=f_in,
                                    dims=self.params.data['dims'])
+        
+        #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
+        #based on flags set by user, this will reformat the stack and save it to a new folder in the .mat file
+        if self.params.get('data', 'source_is_mat') == True or self.params.get('data', 'source_is_mc') == True:
+
+          #open the mat file 
+          path = self.get('data', 'fnames')[0]
+          subfolder = self.get('data', 'var_name_hdf5')
+          f = h5py.File(self.get(fnames, 'r+')
+
+          #save the stack as an array in memory
+          stack = fnames[subfolder][:]
+
+          #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
+
+          matlab_file = self.params.get('data', 'source_is_mat')
+          if matlab_file == True:
+            stack = np.transpose(stack, axes = (0,2,1))
+          
+          #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
+          motion_corrected_source = self.params.get('data', 'source_is_mc')
+          if motion_corrected_source == True:
+            stack = np.nan_to_num(stack, 0)
+
+          #name for the new subfolder
+          new_subfolder = subfolder+'_transformed'
+          #create subfolder for reformatted data and save it
+          f.create_dataset(new_subfolder, data=stack)
+          f.close()
+
+          self.params.data.var_name_hdf5 = new_subfolder
+          self.params.motion.var_name_hdf5 = new_subfolder
 
     def fit_file(self, motion_correct=False, indices=None, include_eval=False):
         """
@@ -380,31 +412,7 @@ class CNMF(object):
                 fname_new = mmapping.save_memmap(fnames, base_name=base_name, order='C')
             Yr, dims, T = mmapping.load_memmap(fname_new)
 
-        raw_images = np.reshape(Yr.T, [T] + list(dims), order='F')
-        print(f'type of raw_images variable: {type(raw_images)}')
-        
-        #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
-        
-        #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
-        
-        #raw_images variable is immutable, so need to copy it to transform
-        raw_images_temp = raw_images.copy('A') # 'A' param keeps memory formatting the same
-        
-        matlab_file = self.params.get('data', 'source_is_mat')
-        if matlab_file == True:
-           raw_images_temp = np.transpose(raw_images_temp, axes = (0,2,1))
-         
-        #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
-        motion_corrected_source = self.params.get('data', 'source_is_mc')
-        if motion_corrected_source == True:
-           raw_images_temp = np.nan_to_num(raw_images_temp, 0)
-        
-        #assign transformed data to images for use with the rest of the code
-        images=raw_images_temp
-        
-        #cleanup
-        del raw_images
-        del raw_images_temp
+        images = np.reshape(Yr.T, [T] + list(dims), order='F')
         
         self.mmap_file = fname_new
         if not include_eval:
