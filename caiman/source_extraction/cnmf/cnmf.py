@@ -386,9 +386,9 @@ class CNMF(object):
         #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
         
         #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
-        #raw_images variable is immutable, so need to copy it to transform
         
-        raw_images_temp = raw_images.copy()
+        #raw_images variable is immutable, so need to copy it to transform
+        raw_images_temp = raw_images.copy('A') # 'A' param keeps memory formatting the same
         
         matlab_file = self.params.get('data', 'source_is_mat')
         if matlab_file == True:
