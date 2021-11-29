@@ -381,7 +381,7 @@ class CNMF(object):
             Yr, dims, T = mmapping.load_memmap(fname_new)
 
         raw_images = np.reshape(Yr.T, [T] + list(dims), order='F')
-        print(f'type of images variable: {type(images)}')
+        print(f'type of raw_images variable: {type(raw_images)}')
         
         #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
         
