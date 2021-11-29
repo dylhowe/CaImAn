@@ -320,37 +320,6 @@ class CNMF(object):
         self.estimates = Estimates(A=Ain, C=Cin, b=b_in, f=f_in,
                                    dims=self.params.data['dims'])
         
-        #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
-        #based on flags set by user, this will reformat the stack and save it to a new folder in the .mat file
-        if self.params.get('data', 'source_is_mat') == True or self.params.get('data', 'source_is_mc') == True:
-
-          #open the mat file 
-          path = self.get('data', 'fnames')[0]
-          subfolder = self.get('data', 'var_name_hdf5')
-          f = h5py.File(self.get(fnames, 'r+')
-
-          #save the stack as an array in memory
-          stack = np.array(f[subfolder])
-
-          #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
-
-          matlab_file = self.params.get('data', 'source_is_mat')
-          if matlab_file == True:
-            stack = np.transpose(stack, axes = (0,2,1))
-          
-          #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
-          motion_corrected_source = self.params.get('data', 'source_is_mc')
-          if motion_corrected_source == True:
-            stack = np.nan_to_num(stack, 0)
-
-          #name for the new subfolder
-          new_subfolder = subfolder+'_transformed'
-          #create subfolder for reformatted data and save it
-          f.create_dataset(new_subfolder, data=stack)
-          f.close()
-
-          self.params.data.var_name_hdf5 = new_subfolder
-          self.params.motion.var_name_hdf5 = new_subfolder
 
     def fit_file(self, motion_correct=False, indices=None, include_eval=False):
         """
@@ -372,6 +341,43 @@ class CNMF(object):
         Returns:
             cnmf object with the current estimates
         """
+        #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
+        #based on flags set by user, this will reformat the stack and save it to a new folder in the .mat file
+        if self.params.get('data', 'source_is_mat') == True or self.params.get('data', 'source_is_mc') == True:
+
+            #open the mat file 
+            path = self.get('data', 'fnames')[0]
+            subfolder = self.get('data', 'var_name_hdf5')
+            f = h5py.File(self.get(fnames, 'r+')
+
+            if subfolder+'_transformed' not in [x for x in f]:
+                
+                #save the stack as an array in memory
+                stack = np.array(f[subfolder])
+
+                #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
+
+                matlab_file = self.params.get('data', 'source_is_mat')
+                if matlab_file == True:
+                    stack = np.transpose(stack, axes = (0,2,1))
+
+                #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
+                motion_corrected_source = self.params.get('data', 'source_is_mc')
+                if motion_corrected_source == True:
+                    stack = np.nan_to_num(stack, 0)
+
+                #name for the new subfolder
+                new_subfolder = subfolder+'_transformed'
+                #create subfolder for reformatted data and save it
+                f.create_dataset(new_subfolder, data=stack)
+                f.close()
+
+                self.params.data.var_name_hdf5 = new_subfolder
+                self.params.motion.var_name_hdf5 = new_subfolder
+            else:
+                self.params.data.var_name_hdf5 = subfolder+'_transformed'
+                self.params.motion.var_name_hdf5 = subfolder+'_transformed'            
+                          
         if indices is None:
             indices = (slice(None), slice(None))
         fnames = self.params.get('data', 'fnames')
