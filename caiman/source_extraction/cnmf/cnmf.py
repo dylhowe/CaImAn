@@ -348,11 +348,9 @@ class CNMF(object):
             #open the mat file 
             path = self.get('data', 'fnames')[0]
             subfolder = self.get('data', 'var_name_hdf5')
-            f = h5py.File(self.get(path, 'r+')
-                          
-            subfolders = [x for x in f]
+            f = h5py.File(path, 'r+')
 
-            if subfolder+'_transformed' not in subfolders:
+            if subfolder+'_transformed' not in [x for x in f]:
                 
                 #save the stack as an array in memory
                 stack = np.array(f[subfolder])
