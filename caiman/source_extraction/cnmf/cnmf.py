@@ -375,10 +375,13 @@ class CNMF(object):
 
                 self.params.data['var_name_hdf5'] = new_subfolder
                 self.params.motion['var_name_hdf5'] = new_subfolder
+                
+                f.close()
                           
             else:
                 self.params.data['var_name_hdf5'] = subfolder+'_transformed'
                 self.params.motion['var_name_hdf5'] = subfolder+'_transformed' 
+                f.close()
                           
         #End additional code
                           
@@ -417,7 +420,7 @@ class CNMF(object):
                 # b0 = 0 if self.params.get('motion', 'border_nan') is 'copy' else 0
                 b0 = 0
                 fname_new = mmapping.save_memmap(fname_mc, base_name=base_name, order='C',
-                                                 border_to_0=b0)
+                                                 border_to_0=b0, var_name_hdf5 = self.params.data.var_name_hdf5)
             else:
                 fname_new = mmapping.save_memmap(fnames, base_name=base_name, order='C')
             Yr, dims, T = mmapping.load_memmap(fname_new)
