@@ -475,12 +475,12 @@ class CNMF(object):
         
         #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
         matlab_file = self.params.get('data', 'source_is_mat')
-        if matlab_file = True:
+        if matlab_file == True:
            images = np.transpose(images, axes = (0,2,1))
          
         #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
         motion_corrected_source = self.params.get('data', 'source_is_mc')
-        if motion_corrected_source = True:
+        if motion_corrected_source == True:
            images = np.nan_to_num(images, 0)
 
         T = images.shape[0]
