@@ -380,21 +380,31 @@ class CNMF(object):
                 fname_new = mmapping.save_memmap(fnames, base_name=base_name, order='C')
             Yr, dims, T = mmapping.load_memmap(fname_new)
 
-        images = np.reshape(Yr.T, [T] + list(dims), order='F')
+        raw_images = np.reshape(Yr.T, [T] + list(dims), order='F')
+        print(f'type of images variable: {type(images)}')
         
         #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
         
         #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
+        #raw_images variable is immutable, so need to copy it to transform
+        
+        raw_images_temp = raw_images.copy()
+        
         matlab_file = self.params.get('data', 'source_is_mat')
-        #if matlab_file == True:
-        #   raw_images_temp = np.transpose(raw_images, axes = (0,2,1))
+        if matlab_file == True:
+           raw_images_temp = np.transpose(raw_images_temp, axes = (0,2,1))
          
         #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
         motion_corrected_source = self.params.get('data', 'source_is_mc')
-        #if motion_corrected_source == True:
-        #   raw_images_temp = np.nan_to_num(raw_images_temp, 0)
+        if motion_corrected_source == True:
+           raw_images_temp = np.nan_to_num(raw_images_temp, 0)
         
-        #images=raw_images_temp
+        #assign transformed data to images for use with the rest of the code
+        images=raw_images_temp
+        
+        #cleanup
+        del raw_images
+        del raw_images_temp
         
         self.mmap_file = fname_new
         if not include_eval:
