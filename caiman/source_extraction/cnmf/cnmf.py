@@ -380,7 +380,22 @@ class CNMF(object):
                 fname_new = mmapping.save_memmap(fnames, base_name=base_name, order='C')
             Yr, dims, T = mmapping.load_memmap(fname_new)
 
-        images = np.reshape(Yr.T, [T] + list(dims), order='F')
+        raw_images = np.reshape(Yr.T, [T] + list(dims), order='F')
+        
+        #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
+        
+        #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
+        matlab_file = self.params.get('data', 'source_is_mat')
+        if matlab_file == True:
+           raw_images = np.transpose(raw_images, axes = (0,2,1))
+         
+        #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
+        motion_corrected_source = self.params.get('data', 'source_is_mc')
+        if motion_corrected_source == True:
+           raw_images = np.nan_to_num(raw_images, 0)
+        
+        images=raw_images
+        
         self.mmap_file = fname_new
         if not include_eval:
             return self.fit(images, indices=indices)
@@ -471,17 +486,6 @@ class CNMF(object):
                             "is not available for loaded in memory or sliced" +
                             " data.")
             
-        #THIS CODE ADDED FOR UVA VISUAL NEUROSCIENCE CAPSTONE PROJECT
-        
-        #If the source file is a .mat format, the movie matrix is stored in format (t,x,y), we need to reformat to (t,y,x)
-        matlab_file = self.params.get('data', 'source_is_mat')
-        if matlab_file == True:
-           images = np.transpose(images, axes = (0,2,1))
-         
-        #if the source file has already been motion corrected, it will have nan's, we need to convert nan's to zero's
-        motion_corrected_source = self.params.get('data', 'source_is_mc')
-        if motion_corrected_source == True:
-           images = np.nan_to_num(images, 0)
 
         T = images.shape[0]
         self.params.set('online', {'init_batch': T})
