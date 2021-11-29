@@ -348,7 +348,7 @@ class CNMF(object):
             #open the mat file 
             path = self.get('data', 'fnames')[0]
             subfolder = self.get('data', 'var_name_hdf5')
-            f = h5py.File(self.get(fnames, 'r+')
+            f = h5py.File(self.get(path, 'r+')
 
             if subfolder+'_transformed' not in [x for x in f]:
                 
@@ -374,6 +374,7 @@ class CNMF(object):
 
                 self.params.data.var_name_hdf5 = new_subfolder
                 self.params.motion.var_name_hdf5 = new_subfolder
+                          
             else:
                 self.params.data.var_name_hdf5 = subfolder+'_transformed'
                 self.params.motion.var_name_hdf5 = subfolder+'_transformed'            
